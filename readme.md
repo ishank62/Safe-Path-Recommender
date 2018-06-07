@@ -43,20 +43,19 @@ We have applied above Unsupervised Machine Learning Algorithm, K-means clusterin
 - Skull: Moderately dangerous
 - Cross: Extremely dangerous
 
-## Displaying maps:
-Homepage of the app looks like:
+### Homepage of the app looks like:
 ![Screenshot 1](https://github.com/ishank62/Safe-Path-Recommender/blob/master/images/Screenshot%20(147).png)
 
 
-This is how the Web App looks like while recommending Safe Paths:
+### This is how the Web App looks like while recommending Safe Paths:
 ![Screenshot 2](https://github.com/ishank62/Safe-Path-Recommender/blob/master/images/Screenshot%20(149).png)
 
 
-Web App Showing Safe Path between “Saket, New Delhi, India” to “Karkardooma, New Delhi, India” with the different markers (Skull, Exclamation Mark Triangle, Smiley, Green Ticks, etc) and different routed each colored differently.:
+### Web App Showing Safe Path between “Saket, New Delhi, India” to “Karkardooma, New Delhi, India” with the different markers (Skull, Exclamation Mark Triangle, Smiley, Green Ticks, etc) and different routed each colored differently.:
 ![Screenshot 3](https://github.com/ishank62/Safe-Path-Recommender/blob/master/images/Screenshot%20(148).png)
 
 
-Figure showing the statistics of the recommended 3 Safe Paths like its Color, Time Duration for the respective path, Distance of the path, Danger Index (according to which the priority of listing of paths is set):
+### Figure showing the statistics of the recommended 3 Safe Paths like its Color, Time Duration for the respective path, Distance of the path, Danger Index (according to which the priority of listing of paths is set):
 ![Screenshot 4](https://github.com/ishank62/Safe-Path-Recommender/blob/master/images/Screenshot%20(150).png)
 
 
