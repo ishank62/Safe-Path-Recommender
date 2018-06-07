@@ -1,0 +1,68 @@
+body{
+	padding-top: 70px;
+	background: url(http://holeinthedonut.smugmug.com/DailyPhotos/HITD-Daily-Photos/i-Wmw432C/0/O/Illinois-Chicago-downtown-street-scene.jpg);
+	background-size: cover;
+	background-position: center;
+}
+
+.jumbotron{
+	color: #2c3e50;
+	background-size: cover;
+	height: 20%;
+    padding: 0.5em 0.6em;}
+    h1{
+        font-size: 2em;
+    }
+    p {
+        font-size: 1.2em;}
+        .btn {
+            padding: 0.5em;
+        }
+    
+
+
+.navbar-inverse{
+	background: #2c3e50;
+}
+
+.navbar-inverse .navbar-nav>li>a{
+	color: white;}
+
+.navbar-inverse .navbar-brand{
+	color:white;
+}
+
+.row {
+	font-family: Raleway;
+	color: white;
+}
+#creator{
+	text-align: center;
+
+}
+#map{
+	text-align: center;
+}
+
+#stats{
+	text-align: center;
+}
+
+#credentials{
+	text-align: center;
+}
+
+footer {
+    position: fixed;
+    height: 30%;
+    bottom: 0;
+    width: 85%;
+}
+
+.fab{
+	font-size: 100px;
+}
+
+.search{
+	margin-top: 20px;
+}

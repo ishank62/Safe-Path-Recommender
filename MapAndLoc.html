@@ -1,0 +1,510 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Safe Path Recommender</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.10/semantic.min.css" >
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="safePath.css">
+	<link href="https://fonts.googleapis.com/css?family=Raleway:800" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.rawgit.com/mladenplavsic/bootstrap-navbar-sidebar/3bd282bd/docs/navbar-fixed-left.min.css">
+ 	<link rel="stylesheet" href="https://cdn.rawgit.com/mladenplavsic/bootstrap-navbar-sidebar/3bd282bd/docs/docs.css">
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	
+	<script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      .controls {
+        margin-top: 10px;
+        border: 1px solid transparent;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        height: 32px;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      #origin-input,
+      #destination-input {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 12px;
+        padding: 0 11px 0 13px;
+        text-overflow: ellipsis;
+        width: 200px;
+      }
+
+      #origin-input:focus,
+      #destination-input:focus {
+        border-color: #4d90fe;
+      }
+
+      #mode-selector {
+        color: #fff;
+        background-color: #4d90fe;
+        margin-left: 12px;
+        padding: 5px 11px 0px 11px;
+      }
+
+      #mode-selector label {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: 300;
+      }
+      li{
+      	font-family: georgia;
+      }
+        body{
+        padding-top: 70px;
+        background: url(http://holeinthedonut.smugmug.com/DailyPhotos/HITD-Daily-Photos/i-Wmw432C/0/O/Illinois-Chicago-downtown-street-scene.jpg);
+        background-size: cover;
+        background-position: center;
+        }
+
+        .jumbotron{
+            color: #2c3e50;
+            background-size: cover;
+            height: 20%;
+            padding: 0.5em 0.6em;}
+            h1{
+                font-size: 2em;
+            }
+            p {
+                font-size: 1.2em;}
+                .btn {
+                    padding: 0.5em;
+                }
+
+
+
+        .navbar-inverse{
+            background: #2c3e50;
+        }
+
+        .navbar-inverse .navbar-nav>li>a{
+            color: white;}
+
+        .navbar-inverse .navbar-brand{
+            color:white;
+        }
+
+        .row {
+            font-family: Raleway;
+            color: white;
+        }
+        #creator{
+            text-align: center;
+
+        }
+        #map{
+            text-align: center;
+        }
+
+        #stats{
+            text-align: center;
+        }
+
+        #credentials{
+            text-align: center;
+        }
+
+        footer {
+            position: fixed;
+            height: 30%;
+            bottom: 0;
+            width: 85%;
+        }
+
+        .fab{
+            font-size: 100px;
+        }
+
+        .search{
+            margin-top: 20px;
+        }
+    </style>
+  </head>
+  <body>
+  	<div class= "ui main container segment">
+  		<h1 style="font-size: 75px; font-family: georgia">Safe Path Recommender</h1>
+  		<h2 style="text-align: right; font-family: georgia">Because you must look before you leave!</h2>
+  	</div>
+    <input id="origin-input" class="controls" type="text"
+        placeholder="Enter an origin location">
+
+    <input id="destination-input" class="controls" type="text"
+        placeholder="Enter a destination location">
+
+    <div id="mode-selector" class="controls">
+      <input type="radio" name="type" id="changemode-walking" checked="checked">
+      <label for="changemode-walking">Walking</label>
+
+      <input type="radio" name="type" id="changemode-transit">
+      <label for="changemode-transit">Transit</label>
+
+      <input type="radio" name="type" id="changemode-driving">
+      <label for="changemode-driving">Driving</label>
+    </div>
+
+    <div id="map" class="ui container"></div>
+   <div class = "ui container">
+   	<h2 style="color: white">Choose the path with the least danger index for a safe travel!</h2>
+   </div>
+    
+       <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCpANrFCV_qCBFMn8BsZFjT0T-nDwa0da8 &libraries=places"
+        ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+   
+    <script>
+   
+      var  data=  [
+	{'lati': 77.249200000000002, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.536300000000001}, {'lati': 77.085999999999999, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.6127}, {'lati': 77.2042, 'type': 'Feature', 'properties': {'mag': 4}, 'longi': 28.529900000000001}, {'lati': 77.236099999999993, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.643599999999999}, {'lati': 77.193700000000007, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.7026}, {'lati': 77.293700000000001, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.653400000000001}, {'lati': 77.226200000000006, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.666399999999999}, {'lati': 77.265299999999996, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.5307}, {'lati': 77.066199999999995, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.609100000000002}, {'lati': 77.267600000000002, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.5623}, {'lati': 77.306200000000004, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.523}, {'lati': 77.224199999999996, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.7072}, {'lati': 77.003600000000006, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.7258}, {'lati': 77.1738, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.66}, {'lati': 77.086399999999998, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.5914}, {'lati': 77.127600000000001, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.7179}, {'lati': 77.179000000000002, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.570499999999999}, {'lati': 77.115899999999996, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.702400000000001}, {'lati': 77.132800000000003, 'type': 'Feature', 'properties': {'mag': 4}, 'longi': 28.674399999999999}, {'lati': 77.015600000000006, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.6037}, {'lati': 77.197400000000002, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.736599999999999}, {'lati': 77.233599999999996, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.652799999999999}, {'lati': 77.175299999999993, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.709800000000001}, {'lati': 77.196100000000001, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.603400000000001}, {'lati': 77.302599999999998, 'type': 'Feature', 'properties': {'mag': 3}, 'longi': 28.6204}, {'lati': 77.088800000000006, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.679600000000001}, {'lati': 77.1511, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.465499999999999}, {'lati': 77.217500000000001, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.649799999999999}, {'lati': 77.119900000000001, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.639700000000001}, {'lati': 77.174899999999994, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.733599999999999}, {'lati': 77.226200000000006, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.643000000000001}, {'lati': 77.224999999999994, 'type': 'Feature', 'properties': {'mag': 4}, 'longi': 28.6309}, {'lati': 77.204899999999995, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.569299999999998}, {'lati': 77.208600000000004, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.700199999999999}, {'lati': 77.292199999999994, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.668800000000001}, {'lati': 77.257400000000004, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.533200000000001}, {'lati': 77.256399999999999, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.5473}, {'lati': 77.180499999999995, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.6478}, {'lati': 77.240499999999997, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.587399999999999}, {'lati': 77.144999999999996, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.630800000000001}, {'lati': 77.274600000000007, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.526800000000001}, {'lati': 77.142200000000003, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.725200000000001}, {'lati': 76.915599999999998, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.595700000000001}, {'lati': 77.120800000000003, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.6266}, {'lati': 77.0608, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.709599999999998}, {'lati': 77.101900000000001, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.710000000000001}, {'lati': 77.240899999999996, 'type': 'Feature', 'properties': {'mag': 4}, 'longi': 28.559100000000001}, {'lati': 77.139099999999999, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.798999999999999}, {'lati': 77.164199999999994, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.7258}, {'lati': 77.1524, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.5349}, {'lati': 77.165700000000001, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.742899999999999}, {'lati': 77.042500000000004, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.796500000000002}, {'lati': 77.0518, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.724499999999999}, {'lati': 77.137799999999999, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.633600000000001}, {'lati': 77.214299999999994, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.498899999999999}, {'lati': 77.1828, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.635000000000002}, {'lati': 77.1571, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.716799999999999}, {'lati': 77.159800000000004, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.684200000000001}, {'lati': 77.119299999999996, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.697800000000001}, {'lati': 77.208500000000001, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.665400000000002}, {'lati': 77.214299999999994, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.629999999999999}, {'lati': 77.244200000000006, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.592400000000001}, {'lati': 77.240600000000001, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.6419}, {'lati': 77.0916, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.6966}, {'lati': 77.306600000000003, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.666799999999999}, {'lati': 77.218800000000002, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.6556}, {'lati': 77.078599999999994, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.7026}, {'lati': 77.276399999999995, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.6554}, {'lati': 77.221500000000006, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.688500000000001}, {'lati': 77.174300000000002, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.692399999999999}, {'lati': 77.101399999999998, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.638999999999999}, {'lati': 77.082899999999995, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.588100000000001}, {'lati': 77.146600000000007, 'type': 'Feature', 'properties': {'mag': 4}, 'longi': 28.6601}, {'lati': 77.099500000000006, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.609400000000001}, {'lati': 77.209299999999999, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.645800000000001}, {'lati': 77.211200000000005, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.654}, {'lati': 77.199100000000001, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.5745}, {'lati': 76.982699999999994, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.6098}, {'lati': 77.087199999999996, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.529599999999999}, {'lati': 77.317099999999996, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.613600000000002}, {'lati': 77.303600000000003, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.4938}, {'lati': 77.144099999999995, 'type': 'Feature', 'properties': {'mag': 4}, 'longi': 28.689}, {'lati': 77.207700000000003, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.6692}, {'lati': 77.206500000000005, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.692499999999999}, {'lati': 77.203199999999995, 'type': 'Feature', 'properties': {'mag': 3}, 'longi': 28.6386}, {'lati': 77.211200000000005, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.598299999999998}, {'lati': 77.240499999999997, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.5684}, {'lati': 77.280699999999996, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.667000000000002}, {'lati': 77.233699999999999, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.604199999999999}, {'lati': 77.313100000000006, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.655999999999999}, {'lati': 77.156199999999998, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.758400000000002}, {'lati': 77.232799999999997, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.554099999999998}, {'lati': 77.068299999999994, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.629999999999999}, {'lati': 77.064899999999994, 'type': 'Feature', 'properties': {'mag': 4}, 'longi': 28.625}, {'lati': 77.233400000000003, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.564699999999998}, {'lati': 77.292400000000001, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.562100000000001}, {'lati': 77.231499999999997, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.662500000000001}, {'lati': 77.290999999999997, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.5016}, {'lati': 77.281999999999996, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.540500000000002}, {'lati': 77.066999999999993, 'type': 'Feature', 'properties': {'mag': 3}, 'longi': 28.681999999999999}, {'lati': 77.198599999999999, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.558499999999999}, {'lati': 77.225499999999997, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.6434}, {'lati': 77.066699999999997, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.578399999999998}, {'lati': 77.101200000000006, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.671099999999999}, {'lati': 77.067400000000006, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.6205}, {'lati': 77.235399999999998, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.618200000000002}, {'lati': 77.119600000000005, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.651499999999999}, {'lati': 77.242999999999995, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.509599999999999}, {'lati': 77.303700000000006, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.607299999999999}, {'lati': 77.078900000000004, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.747699999999998}, {'lati': 77.267300000000006, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.659600000000001}, {'lati': 77.058499999999995, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.5641}, {'lati': 77.158699999999996, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.647500000000001}, {'lati': 77.036000000000001, 'type': 'Feature', 'properties': {'mag': 3}, 'longi': 28.6538}, {'lati': 77.227199999999996, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.5288}, {'lati': 77.270300000000006, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.637799999999999}, {'lati': 77.295299999999997, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.638500000000001}, {'lati': 77.135099999999994, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.640499999999999}, {'lati': 77.208500000000001, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.549399999999999}, {'lati': 77.022800000000004, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.8066}, {'lati': 77.120999999999995, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.730399999999999}, {'lati': 77.247200000000007, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.627400000000002}, {'lati': 77.225099999999998, 'type': 'Feature', 'properties': {'mag': 3}, 'longi': 28.575900000000001}, {'lati': 77.124399999999994, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.598700000000001}, {'lati': 77.193299999999994, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.6526}, {'lati': 77.113299999999995, 'type': 'Feature', 'properties': {'mag': 3}, 'longi': 28.657599999999999}, {'lati': 77.283900000000003, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.643599999999999}, {'lati': 77.158199999999994, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.6524}, {'lati': 77.169300000000007, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.558}, {'lati': 77.193200000000004, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.6526}, {'lati': 77.260199999999998, 'type': 'Feature', 'properties': {'mag': 4}, 'longi': 28.578399999999998}, {'lati': 77.088499999999996, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.853200000000001}, {'lati': 77.311800000000005, 'type': 'Feature', 'properties': {'mag': 4}, 'longi': 28.598199999999999}, {'lati': 77.213700000000003, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.624700000000001}, {'lati': 77.071700000000007, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.664999999999999}, {'lati': 77.306100000000001, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.625399999999999}, {'lati': 77.1785, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.680599999999998}, {'lati': 77.306100000000001, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.625399999999999}, {'lati': 76.966800000000006, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.628699999999998}, {'lati': 76.994699999999995, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.5869}, {'lati': 77.180199999999999, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.5215}, {'lati': 77.146000000000001, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.700399999999998}, {'lati': 77.081900000000005, 'type': 'Feature', 'properties': {'mag': 3}, 'longi': 28.628599999999999}, {'lati': 77.183700000000002, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.668399999999998}, {'lati': 77.192599999999999, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.670000000000002}, {'lati': 77.202600000000004, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.684999999999999}, {'lati': 77.152299999999997, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.5349}, {'lati': 77.118200000000002, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.7089}, {'lati': 77.332700000000003, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.6249}, {'lati': 77.316500000000005, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.678100000000001}, {'lati': 77.268600000000006, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.674299999999999}, {'lati': 77.298599999999993, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.6828}, {'lati': 77.285200000000003, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.674199999999999}, {'lati': 77.256100000000004, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.711099999999998}, {'lati': 77.291700000000006, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.696100000000001}, {'lati': 77.3185, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.706}, {'lati': 76.960800000000006, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.670400000000001}, {'lati': 77.264399999999995, 'type': 'Feature', 'properties': {'mag': 3}, 'longi': 28.7013}, {'lati': 77.272999999999996, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.679099999999998}, {'lati': 77.274799999999999, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.673400000000001}, {'lati': 77.308199999999999, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.698499999999999}, {'lati': 77.316000000000003, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.684999999999999}, {'lati': 77.262100000000004, 'type': 'Feature', 'properties': {'mag': 0}, 'longi': 28.672000000000001}, {'lati': 77.256100000000004, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.711300000000001}, {'lati': 77.274500000000003, 'type': 'Feature', 'properties': {'mag': 2}, 'longi': 28.732800000000001}, {'lati': 77.280799999999999, 'type': 'Feature', 'properties': {'mag': 1}, 'longi': 28.702200000000001}, {'lati': 15.2073, 'longi': 59.276699999999998, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 106.3685, 'longi': -6.2435, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 100.62, 'longi': 36.284100000000002, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 38.0182, 'longi': 36.230800000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -6.8051000000000004, 'longi': 61.554900000000004, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 111.4208, 'longi': -8.0060000000000002, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 100.23390000000001, 'longi': 26.8902, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 117.4301, 'longi': 23.7013, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 110.6512, 'longi': -7.7702, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 48.350200000000001, 'longi': 39.382300000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 12.8316, 'longi': 55.911900000000003, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 44.228900000000003, 'longi': 17.5656, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 26.811499999999999, 'longi': -32.200299999999999, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -67.944000000000003, 'longi': -46.805900000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 111.3546, 'longi': -6.8228999999999997, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 22.883800000000001, 'longi': 50.009099999999997, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 27.25, 'longi': -11.760199999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -47.014499999999998, 'longi': -21.4649, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 91.140600000000006, 'longi': 29.654800000000002, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 101.468, 'longi': 3.3218000000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 92.762100000000004, 'longi': 55.990600000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 117.3188, 'longi': 39.042900000000003, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -86.355800000000002, 'longi': 14.1168, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -79.160499999999999, 'longi': 21.944099999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 18.0733, 'longi': 50.665700000000001, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 174.994, 'longi': -40.9026, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 122.8139, 'longi': 10.527100000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 30.800599999999999, 'longi': 55.024099999999997, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 106.161, 'longi': -6.3384999999999998, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 128.4682, 'longi': 37.1845, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 14.4938, 'longi': 59.313800000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 112.453, 'longi': 41.280999999999999, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 106.5352, 'longi': 29.722799999999999, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -15.9839, 'longi': 13.546799999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 108.5334, 'longi': 32.519199999999998, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 113.2517, 'longi': 22.831099999999999, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 27.654599999999999, 'longi': 48.166600000000003, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 42.825400000000002, 'longi': 33.643500000000003, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -65.173699999999997, 'longi': -24.229900000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -9.3277000000000001, 'longi': 38.805500000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 110.12090000000001, 'longi': -7.3677999999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -35.897100000000002, 'longi': -9.7101000000000006, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 64.182900000000004, 'longi': 53.803199999999997, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 6.8914999999999997, 'longi': 52.784300000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 115.5672, 'longi': -8.5084, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -9.2646999999999995, 'longi': 39.236400000000003, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -80.205600000000004, 'longi': 25.756399999999999, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 114.7209, 'longi': 30.3521, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 118.8, 'longi': 1.05, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 26.8277, 'longi': 62.624299999999998, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 16.707699999999999, 'longi': 51.270099999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 34.421199999999999, 'longi': 0.68120000000000003, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 6.8936000000000002, 'longi': 52.225499999999997, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 19.898199999999999, 'longi': 51.611400000000003, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 141.61359999999999, 'longi': 38.877699999999997, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 34.321100000000001, 'longi': 53.207700000000003, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -7.9699999999999998, 'longi': 40.450200000000002, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 25.445900000000002, 'longi': 36.357300000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -75.687399999999997, 'longi': 4.3921000000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 16.286999999999999, 'longi': 56.673999999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -91.716700000000003, 'longi': 15.083299999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 112.45, 'longi': -6.9176000000000002, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 115.4842, 'longi': 38.866500000000002, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 106.3228, 'longi': -2.4944999999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 22.4649, 'longi': 13.447900000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -58.540500000000002, 'longi': -34.676099999999998, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 62.810200000000002, 'longi': 61.206699999999998, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -7.0625999999999998, 'longi': 53.138800000000003, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 124.6703, 'longi': 46.465400000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 16.914000000000001, 'longi': 43.408799999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 10.767300000000001, 'longi': 59.905099999999997, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 39.478999999999999, 'longi': 50.942700000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 114.2153, 'longi': -7.8879999999999999, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': -76.665800000000004, 'longi': -11.901899999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 15.0267, 'longi': 50.7911, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -63.223799999999997, 'longi': -17.566199999999998, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 113.9564, 'longi': -7.0353000000000003, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 125.22029999999999, 'longi': -8.9837000000000007, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 14.1539, 'longi': 9.7638999999999996, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 46.746499999999997, 'longi': 39.753700000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 116.29940000000001, 'longi': 28.002199999999998, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 113.14, 'longi': 40.255899999999997, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 23.179500000000001, 'longi': 61.1036, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -3.9725000000000001, 'longi': 6.6745999999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 122.0183, 'longi': 6.6904000000000003, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 47.0291, 'longi': -19.873000000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 13.230600000000001, 'longi': 32.8904, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -61.486899999999999, 'longi': -33.453499999999998, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -46.4617, 'longi': -23.668199999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 19.616, 'longi': 49.909100000000002, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 30.8307, 'longi': 49.262700000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 20.003299999999999, 'longi': 40.931399999999996, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 49.604399999999998, 'longi': 14.763400000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 18.0992, 'longi': 49.494100000000003, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 119.6499, 'longi': -4.4363999999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 118.6703, 'longi': 31.934000000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -99.080600000000004, 'longi': 19.358000000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 2.2570999999999999, 'longi': 48.946800000000003, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -67.081999999999994, 'longi': 52.783499999999997, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 121.0308, 'longi': 14.6004, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': -85.454999999999998, 'longi': 10.142799999999999, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 33.880200000000002, 'longi': -24.7057, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 141.27780000000001, 'longi': 38.579599999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -63.696399999999997, 'longi': -29.493400000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 17.2134, 'longi': 43.412100000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 17.977799999999998, 'longi': 59.3688, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 101.8085, 'longi': 36.608199999999997, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 54.006799999999998, 'longi': 46.969099999999997, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -47.563299999999998, 'longi': -23.510300000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -80.365899999999996, 'longi': 7.5909000000000004, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 44.003700000000002, 'longi': 56.2836, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 107.1362, 'longi': 10.4114, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 116.1936, 'longi': 26.751300000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 3.8626, 'longi': 43.612200000000001, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 106.7615, 'longi': 21.8537, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -4.1917, 'longi': 33.613199999999999, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 117.00539999999999, 'longi': 38.895099999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 116.5226, 'longi': -8.6940000000000008, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 11.841699999999999, 'longi': 58.076700000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 44.549799999999998, 'longi': 44.042700000000004, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -8.5234000000000005, 'longi': 39.754600000000003, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 121.0394, 'longi': 14.5001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 72.7393, 'longi': 41.028500000000001, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 109.9483, 'longi': 19.3184, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 100.7717, 'longi': 22.0001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 124.7908, 'longi': 12.5351, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': -73.564499999999995, 'longi': 45.508000000000003, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 139.86709999999999, 'longi': 37.645400000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 48.960299999999997, 'longi': 57.578000000000003, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -65.005200000000002, 'longi': -31.7437, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 59.892200000000003, 'longi': 56.885800000000003, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 93.419899999999998, 'longi': 28.564900000000002, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 123.0979, 'longi': -10.724600000000001, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': -96.343800000000002, 'longi': 30.671700000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 21.852499999999999, 'longi': 56.4178, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -90.003500000000003, 'longi': 14.1387, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -81.207599999999999, 'longi': 46.608699999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -45.295699999999997, 'longi': -20.085899999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -123.36, 'longi': 48.455800000000004, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 112.0476, 'longi': 24.034500000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 5.7319000000000004, 'longi': 58.967100000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 33.2898, 'longi': 69.047399999999996, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -90.807199999999995, 'longi': 14.994199999999999, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 80.765799999999999, 'longi': 29.8812, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -70.7423, 'longi': -33.730899999999998, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 31.399899999999999, 'longi': -0.41649999999999998, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 111.3754, 'longi': -7.6436000000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -38.590000000000003, 'longi': -12.6655, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 108.6324, 'longi': -7.4721000000000002, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -84.762900000000002, 'longi': 9.9779, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 17.4115, 'longi': 49.5672, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 26.336099999999998, 'longi': 49.118499999999997, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 37.2089, 'longi': 35.154200000000003, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -8.3142999999999994, 'longi': 31.2394, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -45.037300000000002, 'longi': -3.2023999999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 118.0368, 'longi': 28.227900000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 108.3475, 'longi': -6.9278000000000004, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -76.2273, 'longi': -12.362500000000001, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 2.4396, 'longi': 44.926299999999998, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 33.081699999999998, 'longi': -2.843, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -0.60709999999999997, 'longi': 47.854100000000003, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 39.6526, 'longi': -5.3628999999999998, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 120.67749999999999, 'longi': 23.917999999999999, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 113.4071, 'longi': 23.131799999999998, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 133.1275, 'longi': 35.520600000000002, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -8.4834999999999994, 'longi': 42.079300000000003, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 113.2711, 'longi': 26.715299999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 23.200099999999999, 'longi': 41.391100000000002, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 128.84110000000001, 'longi': 32.696399999999997, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 87.539599999999993, 'longi': 42.5246, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 33.709899999999998, 'longi': 1.1707000000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 126.7366, 'longi': 35.967700000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -69.534899999999993, 'longi': -14.6806, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -99.007400000000004, 'longi': 19.410299999999999, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -73.807599999999994, 'longi': 40.6999, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 123.19, 'longi': 13.434799999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 59.3628, 'longi': 43.0139, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 124.1067, 'longi': 13.7362, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -8.0990000000000002, 'longi': 37.102899999999998, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': -9.2517999999999994, 'longi': 38.777799999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 30.559699999999999, 'longi': 53.865299999999998, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 116.4691, 'longi': 39.993000000000002, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 123.19889999999999, 'longi': 9.0965000000000007, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 32.014200000000002, 'longi': 54.273200000000003, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 46.746499999999997, 'longi': 39.753700000000002, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 123.2711, 'longi': 10.1088, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': -45.966299999999997, 'longi': -23.2988, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 110.4312, 'longi': -6.9856999999999996, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 107.1782, 'longi': -6.8007999999999997, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 91.292400000000001, 'longi': 51.406999999999996, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -103.84520000000001, 'longi': 49.666699999999999, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 124.92019999999999, 'longi': 11.185600000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 107.9802, 'longi': 30.978300000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 118.627, 'longi': 28.737300000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 24.753599999999999, 'longi': 59.436999999999998, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 79.884299999999996, 'longi': 7.1802000000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 43.100000000000001, 'longi': 40.610799999999998, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 14.702999999999999, 'longi': 49.852899999999998, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -71.489400000000003, 'longi': -35.536499999999997, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 33.916899999999998, 'longi': 47.498100000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 12.1927, 'longi': -5.5774999999999997, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 22.294, 'longi': 54.048099999999998, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 107.38200000000001, 'longi': 36.135199999999998, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 174.20779999999999, 'longi': -35.755000000000003, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 43.619999999999997, 'longi': 43.475299999999997, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 7.5468000000000002, 'longi': 51.9602, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 114.7654, 'longi': 25.6614, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -65.536600000000007, 'longi': -19.0154, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 101.34310000000001, 'longi': 24.475300000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 117.5099, 'longi': 37.489899999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 16.722799999999999, 'longi': 44.559699999999999, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 113.26439999999999, 'longi': 23.129100000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -42.803600000000003, 'longi': -5.0396000000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -51.957999999999998, 'longi': -29.365200000000002, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 106.6803, 'longi': -6.8482000000000003, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 118.7011, 'longi': 39.999200000000002, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -76.942400000000006, 'longi': -12.057600000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 16.493600000000001, 'longi': 13.648099999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 120.5622, 'longi': 27.4833, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': -79.374399999999994, 'longi': 43.642200000000003, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 43.497, 'longi': -11.9148, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 22.9588, 'longi': 40.475000000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 45.139499999999998, 'longi': -12.8491, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 7.9127999999999998, 'longi': 5.0377000000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -6.1241000000000003, 'longi': 53.231400000000001, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 99.623000000000005, 'longi': 7.7735000000000003, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 113.39279999999999, 'longi': 22.517600000000002, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 15.6213, 'longi': 53.639200000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 111.7084, 'longi': -8.0806000000000004, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 109.5038, 'longi': 38.253300000000003, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 106.8031, 'longi': -6.641, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -111.7433, 'longi': 53.713099999999997, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 116.465, 'longi': 23.9132, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 144.0712, 'longi': -4.0438999999999998, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 120.11490000000001, 'longi': 30.194299999999998, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -8.0890000000000004, 'longi': 41.0717, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -8.5996000000000006, 'longi': 42.438600000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 109.6922, 'longi': -7.7091000000000003, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 115.7978, 'longi': 28.5701, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -8.3627000000000002, 'longi': 41.247900000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 108.6747, 'longi': -7.5208000000000004, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 85.2774, 'longi': 26.783100000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 114.563, 'longi': 24.364100000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -52.724200000000003, 'longi': -24.266999999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 38.573500000000003, 'longi': 54.853900000000003, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 35.253300000000003, 'longi': -14.4862, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 140.99700000000001, 'longi': 38.2956, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 23.728300000000001, 'longi': 41.572800000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 111.2517, 'longi': -7.0511999999999997, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 33.672400000000003, 'longi': 67.610699999999994, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 39.317999999999998, 'longi': -4.1393000000000004, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -0.70089999999999997, 'longi': 53.372399999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 34.945799999999998, 'longi': -0.77710000000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -91.206199999999995, 'longi': 14.7403, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 112.2556, 'longi': 30.3111, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 39.178400000000003, 'longi': 55.918100000000003, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 44.114699999999999, 'longi': 13.8345, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 5.4043999999999999, 'longi': 43.596299999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 101.9571, 'longi': 29.9984, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 173.13900000000001, 'longi': 1.387, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 105.7557, 'longi': 18.664200000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 129.50890000000001, 'longi': 42.891300000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 121.46720000000001, 'longi': 31.232800000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 121.05889999999999, 'longi': 14.759600000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 104.63500000000001, 'longi': 35.003900000000002, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 104.10590000000001, 'longi': 22.767499999999998, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 29.233499999999999, 'longi': -26.491199999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 61.981400000000001, 'longi': 33.671599999999998, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 14.285600000000001, 'longi': 50.5032, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -77.026300000000006, 'longi': 38.897399999999998, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -175.20490000000001, 'longi': -21.139299999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 107.5408, 'longi': 47.249499999999998, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 18.259699999999999, 'longi': 49.341999999999999, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 121.375, 'longi': 28.373999999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 127.4954, 'longi': 36.642499999999998, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 108.8822, 'longi': 32.164999999999999, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -7.9699999999999998, 'longi': 40.450200000000002, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -81.020300000000006, 'longi': 44.149900000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 107.6639, 'longi': -6.9276, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 104.32129999999999, 'longi': 52.279600000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 23.973600000000001, 'longi': 50.058900000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 120.9807, 'longi': 14.481999999999999, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 112.11069999999999, 'longi': -8.0937000000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 123.8661, 'longi': -9.7731999999999992, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 103.45699999999999, 'longi': 0.6633, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 26.330500000000001, 'longi': 64.097099999999998, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 114.9873, 'longi': 24.0183, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 116.3289, 'longi': 29.865500000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 136.78659999999999, 'longi': -3.7837000000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 107.8039, 'longi': 30.674399999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -96.0, 'longi': 36.149999999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -9.1417999999999999, 'longi': 38.735999999999997, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 114.38549999999999, 'longi': 30.639600000000002, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -14.196, 'longi': 13.237500000000001, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 120.6717, 'longi': 15.045400000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 35.329999999999998, 'longi': 32.0854, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -45.9482, 'longi': -21.426100000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -121.8278, 'longi': 37.237499999999997, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 110.61320000000001, 'longi': 36.995199999999997, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -6.4496000000000002, 'longi': 53.358199999999997, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 33.366900000000001, 'longi': 45.190399999999997, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 133.47890000000001, 'longi': 33.645000000000003, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 103.9237, 'longi': 30.5745, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 108.80759999999999, 'longi': 23.724799999999998, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 101.5377, 'longi': 25.052900000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 120.9217, 'longi': 31.036200000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 2.3948, 'longi': 48.819299999999998, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 19.287600000000001, 'longi': 53.066299999999998, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 85.800600000000003, 'longi': 51.954099999999997, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 29.5398, 'longi': 3.0331000000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 104.6553, 'longi': 34.995699999999999, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 112.03270000000001, 'longi': -8.2796000000000003, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 121.13120000000001, 'longi': 28.845400000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 122.986, 'longi': -8.4507999999999992, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': -96.816199999999995, 'longi': 32.953699999999998, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 37.805999999999997, 'longi': 55.641199999999998, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 120.788, 'longi': 37.540399999999998, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 110.5934, 'longi': -7.5172999999999996, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 49.263599999999997, 'longi': 53.543599999999998, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -65.310900000000004, 'longi': -43.274500000000003, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 100.7323, 'longi': 14.2525, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -58.7226, 'longi': -34.476500000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -99.205799999999996, 'longi': 19.480599999999999, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 125.32980000000001, 'longi': 7.9187000000000003, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 25.426400000000001, 'longi': 57.538499999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 30.287199999999999, 'longi': 60.001899999999999, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 121.2227, 'longi': -8.4699000000000009, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 23.919899999999998, 'longi': 38.292499999999997, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -2.0958999999999999, 'longi': 11.097899999999999, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -58.808999999999997, 'longi': -27.5059, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -57.543100000000003, 'longi': -38.003300000000003, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 112.9323, 'longi': 28.408200000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 23.586400000000001, 'longi': 52.745699999999999, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': -71.992699999999999, 'longi': -13.5067, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 108.2495, 'longi': 31.364899999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 120.00920000000001, 'longi': 30.779399999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -7.6593, 'longi': 40.983800000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -52.233699999999999, 'longi': -27.684899999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 117.1665, 'longi': 39.073799999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -111.90179999999999, 'longi': 51.633400000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -68.137299999999996, 'longi': -16.496300000000002, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 85.102699999999999, 'longi': 56.579000000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 118.4515, 'longi': 35.555999999999997, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 119.14149999999999, 'longi': 28.0746, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 110.47920000000001, 'longi': 29.117100000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -94.774299999999997, 'longi': 39.114100000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 7.5625999999999998, 'longi': 6.0312999999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 35.755699999999997, 'longi': 33.231999999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 33.303699999999999, 'longi': 0.72509999999999997, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 2.2761, 'longi': 48.881, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 35.126800000000003, 'longi': 31.870200000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 67.821200000000005, 'longi': 34.810000000000002, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 106.0243, 'longi': -6.5110000000000001, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 119.2473, 'longi': -9.5635999999999992, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -9.7093000000000007, 'longi': 31.212199999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -63.536200000000001, 'longi': -31.5535, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 106.7556, 'longi': -6.2896999999999998, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 117.4285, 'longi': -8.5039999999999996, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 36.741500000000002, 'longi': 35.286700000000003, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 107.25749999999999, 'longi': 27.4175, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 123.8426, 'longi': 8.3331999999999997, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 120.1551, 'longi': 30.274100000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 114.9606, 'longi': -8.2712000000000003, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 116.68640000000001, 'longi': 39.872, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 102.8352, 'longi': 23.219899999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': -52.767000000000003, 'longi': -23.224599999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 40.058599999999998, 'longi': 1.7487999999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 17.842500000000001, 'longi': 59.3673, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 13.197900000000001, 'longi': 49.560400000000001, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': -38.3232, 'longi': -12.7073, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 111.5498, 'longi': -7.3966000000000003, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 49.825600000000001, 'longi': 40.474299999999999, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 37.442900000000002, 'longi': 55.6614, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 39.936300000000003, 'longi': 47.755800000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -8.4907000000000004, 'longi': 41.654800000000002, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 51.730899999999998, 'longi': 35.3078, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 73.094700000000003, 'longi': 52.5017, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -76.665800000000004, 'longi': -11.901899999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 101.8417, 'longi': 26.695399999999999, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': -8.0733999999999995, 'longi': 40.240699999999997, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 22.961400000000001, 'longi': 51.0687, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -1.2795000000000001, 'longi': 5.1315, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 124.9134, 'longi': 1.302, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 34.672199999999997, 'longi': 59.496400000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 22.623000000000001, 'longi': 52.360900000000001, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 24.212900000000001, 'longi': 48.054600000000001, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 3.8626, 'longi': 43.612200000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 22.343299999999999, 'longi': 48.6541, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -79.433800000000005, 'longi': -7.7001999999999997, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 109.4498, 'longi': 34.9315, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 120.1534, 'longi': 30.331199999999999, 'type': 'Feature', 'properties': {'mag': 3}}, {'lati': 14.755000000000001, 'longi': -2.5398999999999998, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': -43.028100000000002, 'longi': -15.741199999999999, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 104.55, 'longi': 33.8887, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': 80.9435, 'longi': 6.7671999999999999, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -93.156899999999993, 'longi': 16.764700000000001, 'type': 'Feature', 'properties': {'mag': 2}}, {'lati': 120.9905, 'longi': 14.2958, 'type': 'Feature', 'properties': {'mag': 4}}, {'lati': 118.01560000000001, 'longi': 27.353100000000001, 'type': 'Feature', 'properties': {'mag': 0}}, {'lati': -76.112899999999996, 'longi': -5.9008000000000003, 'type': 'Feature', 'properties': {'mag': 1}}, {'lati': 151.20189999999999, 'longi': -33.863900000000001, 'type': 'Feature', 'properties': {'mag': 2}}
+];
+        var map;
+        var directionsDisplay;
+          var directionsService;
+
+      function initMap(location) {
+         directionsService = new google.maps.DirectionsService();
+          directionsDisplay = new google.maps.DirectionsRenderer();
+          var loc = new google.maps.LatLng(location.coords.latitude,location.coords.longitude);
+        map = new google.maps.Map(document.getElementById('map'), {
+          mapTypeControl: false,
+          zoom: 7,
+          center: loc,
+          mapTypeId: 'terrain'
+        });
+        var marker = new google.maps.Marker({
+          position: loc,
+          map: map
+        }); 
+
+        // directionsDisplay.setMap(map);
+         directionsDisplay.setMap(map);
+         var script = document.createElement('script');
+        //script.src = 'helper.js';
+         document.getElementsByTagName('head')[0].appendChild(script);
+
+          map.data.setStyle(function(feature) {
+          var magnitude = feature.getProperty('mag');
+          console.log(typeof(magnitude));
+          return {
+            icon: getCircle(magnitude)
+          };
+        });
+        new AutocompleteDirectionsHandler(map);
+      }
+      function getCircle(magnitude) {
+        return {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: 'red',
+          fillOpacity: .2,
+          scale: Math.pow(2, magnitude) / 2,
+          strokeColor: 'white',
+          strokeWeight: .5
+        };
+      }
+
+       /**
+        * @constructor
+       */
+      function AutocompleteDirectionsHandler(map) {
+        this.map = map;
+        this.originPlaceId = null;
+        this.destinationPlaceId = null;
+        this.travelMode = 'WALKING';
+        var originInput = document.getElementById('origin-input');
+        var destinationInput = document.getElementById('destination-input');
+        var modeSelector = document.getElementById('mode-selector');
+        this.directionsService = new google.maps.DirectionsService;
+        this.directionsDisplay = new google.maps.DirectionsRenderer;
+        this.directionsDisplay.setMap(map);
+
+        var originAutocomplete = new google.maps.places.Autocomplete(
+            originInput, {placeIdOnly: true});
+        var destinationAutocomplete = new google.maps.places.Autocomplete(
+            destinationInput, {placeIdOnly: true});
+        this.setupClickListener('changemode-driving', 'DRIVING');
+        this.setupClickListener('changemode-walking', 'WALKING');
+        this.setupClickListener('changemode-transit', 'TRANSIT');
+        //this.setupClickListener('changemode-driving', 'DRIVING');
+
+        this.setupPlaceChangedListener(originAutocomplete, 'ORIG');
+        this.setupPlaceChangedListener(destinationAutocomplete, 'DEST');
+
+        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(originInput);
+        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(destinationInput);
+        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
+      }
+
+      // Sets a listener on a radio button to change the filter type on Places
+      // Autocomplete.
+      AutocompleteDirectionsHandler.prototype.setupClickListener = function(id, mode) {
+        var radioButton = document.getElementById(id);
+        var me = this;
+        radioButton.addEventListener('click', function() {
+          me.travelMode = mode;
+          me.route();
+        });
+      };
+
+      AutocompleteDirectionsHandler.prototype.setupPlaceChangedListener = function(autocomplete, mode) {
+        var me = this;
+        autocomplete.bindTo('bounds', this.map);
+        autocomplete.addListener('place_changed', function() {
+          var place = autocomplete.getPlace();
+          if (!place.place_id) {
+            window.alert("Please select an option from the dropdown list.");
+            return;
+          }
+          if (mode === 'ORIG') {
+            me.originPlaceId = place.place_id;
+          } else {
+            me.destinationPlaceId = place.place_id;
+          }
+          me.route();
+        });
+
+      };
+
+      AutocompleteDirectionsHandler.prototype.route = function() {
+        if (!this.originPlaceId || !this.destinationPlaceId) {
+          return;
+        }
+        var me = this;
+
+        this.directionsService.route({
+          origin: {'placeId': this.originPlaceId},
+          destination: {'placeId': this.destinationPlaceId},
+          travelMode: this.travelMode,
+          provideRouteAlternatives: true,
+          unitSystem: google.maps.UnitSystem.METRIC
+        }, function(response, status) {
+          if (status === 'OK') {
+            var image1 = {
+          url: 'https://cdn.pixabay.com/photo/2012/04/23/16/54/warning-39047_640.png',
+          // This marker is 20 pixels wide by 32 pixels high.
+           scaledSize: new google.maps.Size(28, 28),
+         // size: new google.maps.Size(20, 32),
+    
+        };
+          var image2 = {
+          url: 'https://www.canada.ca/content/dam/hc-sc/migration/hc-sc/cps-spc/images/legislation/acts-lois/hazard-symbol-danger1.jpg',
+          // This marker is 20 pixels wide by 32 pixels high.
+           scaledSize: new google.maps.Size(28, 28),
+         // size: new google.maps.Size(20, 32),
+    
+        };
+        ;
+          var image3 = {
+          url: 'https://cdn3.iconfinder.com/data/icons/picons-weather/57/53_warning-256.png',
+          // This marker is 20 pixels wide by 32 pixels high.
+           scaledSize: new google.maps.Size(23, 23),
+         // size: new google.maps.Size(20, 32),
+    
+        };
+        var image4 = {
+          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/SNice.svg/220px-SNice.svg.png',
+          // This marker is 20 pixels wide by 32 pixels high.
+           scaledSize: new google.maps.Size(23, 23),
+         // size: new google.maps.Size(20, 32),
+    
+        };
+        var image5 = {
+          url: 'https://static9.depositphotos.com/1431107/1143/i/950/depositphotos_11437164-stock-photo-green-tick.jpg',
+          // This marker is 20 pixels wide by 32 pixels high.
+           scaledSize: new google.maps.Size(23, 23),
+         // size: new google.maps.Size(20, 32),
+    
+        };
+        color=["purple","yellow","green","blue","pink"];
+            //me.directionsDisplay.setDirections(response);
+           console.log(response.routes.length);
+           var dindex=[];
+             for (var k = 0, len = response.routes.length; k < len; k++) {
+              dindex[k]=0;
+              var points = response.routes[k].overview_path;
+              //console.log("yayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
+              //console.log(points.length);
+               new google.maps.DirectionsRenderer({
+                    map: map,
+                    directions: response,
+                    routeIndex: k,
+                     unitSystem: google.maps.UnitSystem.METRIC,
+                    provideRouteAlternatives: true,
+                      polylineOptions: {
+                    strokeColor: color[k],
+                    strokeOpacity: 0.7,
+                    strokeWeight: 10
+
+                }
+
+                });
+               //console.log(points);
+               //console.log(data);
+               var  infoWindow = new google.maps.InfoWindow;
+               var posInit;
+                        var count = 0;
+             for (var j = 0; j < points.length; j++) {
+                      for (var i = 0; i < data.length; i++) {
+                   
+                        var st1 = data[i].lati.toString();
+                        st1=st1.slice(0,(st1.indexOf("."))+3);
+                        var st3 = data[i].longi.toString();
+                        st3=st3.slice(0,(st3.indexOf("."))+3);
+                        var st2 = points[j].lng().toString();
+                        st2=st2.slice(0,(st2.indexOf("."))+3);
+                        var st4 = points[j].lat().toString();
+                        st4=st4.slice(0,(st4.indexOf("."))+3);
+                      
+                         if ((st1 === st2) && (st3 === st4))
+                          {
+                            count++;
+                              posInit = new google.maps.LatLng(data[i].longi,data[i].lati);
+                           
+                               if(data[i].properties.mag==4){
+         var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(data[i].longi,data[i].lati),
+          icon:image1,
+          map: map
+        });
+dindex[k]+=4;
+         }
+         else if(data[i].properties.mag==3){
+         var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(data[i].longi,data[i].lati),
+          icon:image2,
+          map: map
+        }); dindex[k]+=3;}
+       else if(data[i].properties.mag==2){
+         var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(data[i].longi,data[i].lati),
+          icon:image3,
+          map: map
+        }); dindex[k]+=2;}
+        else if(data[i].properties.mag==1){
+         var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(data[i].longi,data[i].lati),
+          icon:image4,
+          map: map
+        }); dindex[k]+=1;}
+        else if(data[i].properties.mag==0){
+         var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(data[i].longi,data[i].lati),
+          icon:image5,
+          map: map
+        }); }
+                        
+                  }
+                  }
+
+                }
+              
+ dindex[k]/=count;
+ var div = document.createElement('div');
+ div.className = "ui main container segment"
+ document.body.appendChild(div);
+ var colour = "color"+k,
+ 	 duration = "duration"+k,
+ 	 distance = "distance"+k,
+ 	 safetyi = "safetyi"+k;
+ div.innerHTML = '<ul class="msg"><li id='+colour+'></li><li id='+duration+'></li><li id='+distance+'></li><li id='+safetyi+'></li></ul>';
+  document.getElementById(colour).innerHTML = "Route Number:  " + k + " is colored " +
+      (color[k]) ;
+   document.getElementById(distance).innerHTML = "Distance  : " +
+      (response.routes[k].legs[0].distance.text) ;
+    //console.log((response.routes[i].legs[0].distance.value) / 1000 + "killo meters");
+    // Display the duration:
+    document.getElementById(duration).innerHTML = "Time duration for reaching : " +
+      response.routes[k].legs[0].duration.text;
+    console.log(response.routes[k].legs[0]);
+  infoWindow.setPosition(posInit);
+   var message = 'dangerIndex is :'+dindex[k];
+  document.getElementById(safetyi).innerHTML = message;
+  var dis='Route :'+k;
+   //infoWindow.setContent(dis);
+      //       infoWindow.open(map);
+ 
+          
+        }
+          //  console.log(dindex);
+var routes = response.routes;
+                    for (var j = 0; j < routes.length; j++) {
+                        var points = routes[j].overview_path;
+                        
+    
+                    }
+                    
+         
+          } else {
+            window.alert('Directions request failed due to ' + status);
+          }
+        });
+      };
+  
+      $(document).ready(function(){
+        navigator.geolocation.getCurrentPosition(initMap);
+      });
+    </script>
+    <footer class="fixed-bottom">
+    	<div class="container">
+    		<div class="row">
+				<div class="col-md-4" >
+		   			 <h3>About us</h3>
+		    		<p>
+		        	Junior Year developers trying to visualize data distribution concepts and its usage in crime sensing applications.
+		    		</p>
+				</div>
+		
+				<div class="col-md-4">
+		   			 <h3> Our location </h3>
+		   			<address>
+		   			Jaypee Institute of Information Technology
+					A-10, Sector 62
+					Noida-201307
+		   			</address>
+				</div>
+				<div class="col-md-4" >
+		    		<h3>Contact Us</h3>
+		    		<ul>
+		        	<li>Phone : 9711037572 </li>
+		        	<li>E-mail : sarthakjoshi2496@gmail.com </li>
+		        	<li>Fax : 123 - 456 - 789</li>
+		    		</ul>
+		    
+				</div>
+    		</div>
+    		<div class="row">
+    			<div class="col-md-4"> 
+					<i class="fab fa-facebook-square fa-2x"></i>
+				</div>
+				<div class="col-md-4"> 
+					<i class="fab fa-twitter-square fa-2x"></i>
+				</div>
+				<div class="col-md-4"> 
+					<i class="fab fa-google-plus-square fa-2x"></i>
+				</div>
+    		</div>
+    	</div>
+    
+</footer>
+  </body>
+</html>
